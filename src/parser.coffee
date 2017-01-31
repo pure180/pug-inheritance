@@ -35,6 +35,8 @@ class Parser
 
     @skipInheritances = if @options.skip then @options.skip else pkginfo.skipInheritances
 
+    @pugWalkAstType = if @options.pugWalkAstType && typeof @options.pugWalkAstType == 'string' then @options.pugWalkAstType else 'RawInclude'
+
     @cache = {}
     @files = {}
 
@@ -86,13 +88,13 @@ class Parser
 
         type = node.type
         switch type
-          when 'Extends', (if @options.deprecated then 'Include' else 'RawInclude')
+          when 'Extends', @pugWalkAstType
             path = resolvePath node.file.path, file, @options.basedir, @extension, type
 
             if path is nodePath.join(@options.basedir, filename)
               if type is 'Extends'
                 relationship = 'extendedBy'
-              else if type is 'RawInclude' || type is 'Include'
+              else if @pugWalkAstType
                 relationship = 'includedBy'
 
               newFile = {}
